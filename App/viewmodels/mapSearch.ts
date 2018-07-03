@@ -11,6 +11,7 @@ class mapSearch {
     markers: google.maps.Marker[];
     bounds: google.maps.LatLngBounds;
     key: string;
+    mashapeKey: string;
     geocodingURL: string;
     crimesURL: string;
     date: string;
@@ -18,8 +19,9 @@ class mapSearch {
     constructor(){
         this.postcode = ko.observable();
         this.key = 'AIzaSyDP96fg0o4JSNjnOT69i_9ZquS2vWVcK-A';
+        this.mashapeKey = 'U1e9OO4IdamshV44Do3XIX845EVnp1N2rIajsnICoqUR4xz3A0';
         this.geocodingURL = 'https://maps.googleapis.com/maps/api/geocode/json';
-        this.crimesURL = 'https://data.police.uk/api/crimes-at-location';
+        this.crimesURL = 'https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-at-location';
         this.markers = [];
         this.bounds = new google.maps.LatLngBounds;
         this.date = '2014-12';
@@ -66,19 +68,31 @@ class mapSearch {
     }
 
     loadCrimesOnMap(): void {
+        var self = this;
+
         this.getLatLng().then(latlng => {
             if (!latlng){
                 app.showMessage('Location not found.');
             } else {
-                $.getJSON(this.crimesURL, { date: this.date, lat: latlng.lat, lng: latlng.lng }).then(crimes => {
-                    if (crimes.length){
-                        crimes.forEach(crime => {
-                            this.addMarkerToMap(crime);
-                        })
-                        this.map.fitBounds(this.bounds);
-                    } else {
-                        app.showMessage('No results found!');
-                    }                
+                $.ajax({
+                    url: this.crimesURL,
+                    data: { date: this.date, lat: latlng.lat, lng: latlng.lng },
+                    beforeSend: function(request){
+                        request.setRequestHeader('X-Mashape-Key', self.mashapeKey);
+                    },
+                    success: function(crimes){
+                        if (crimes.length){
+                            crimes.forEach(crime => {
+                                this.addMarkerToMap(crime);
+                            })
+                            this.map.fitBounds(this.bounds);
+                        } else {
+                            app.showMessage('No results found!');
+                        }
+                    },
+                    error: function(err, textStatus, errMessage){
+                        app.showMessage('Something went wrong: ' + textStatus);
+                    }
                 })
             }
         })
