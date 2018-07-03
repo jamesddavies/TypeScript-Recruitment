@@ -1,15 +1,24 @@
+declare var google: any;
+
 import app = require('durandal/app');
 import ko = require('knockout');
 import $ = require('jquery');
 
 type Crime = any;
 
+//type Marker = google.maps.Marker;
+type Marker = any;
+//type Bounds = google.maps.LatLngBounds;
+type Bounds = any;
+//type Map = google.maps.Map;
+type Map = any;
+
 class mapSearch {
 
     postcode: KnockoutObservable<string>;
-    map: google.maps.Map;
-    markers: google.maps.Marker[];
-    bounds: google.maps.LatLngBounds;
+    map: Map;
+    markers: Marker[];
+    bounds: Bounds;
     key: string;
     mashapeKey: string;
     geocodingURL: string;
@@ -17,7 +26,7 @@ class mapSearch {
     date: string;
 
     constructor(){
-        this.postcode = ko.observable();
+        this.postcode = ko.observable('');
         this.key = 'AIzaSyDP96fg0o4JSNjnOT69i_9ZquS2vWVcK-A';
         this.mashapeKey = 'U1e9OO4IdamshV44Do3XIX845EVnp1N2rIajsnICoqUR4xz3A0';
         this.geocodingURL = 'https://maps.googleapis.com/maps/api/geocode/json';
@@ -28,7 +37,7 @@ class mapSearch {
     }
 
     postcodeIsValid(): boolean {
-        let postcodeRegex = new RegExp(/[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}/gi);
+        let postcodeRegex = new RegExp('[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}', 'gi');
         return postcodeRegex.test(this.postcode())
     }
 
@@ -99,7 +108,7 @@ class mapSearch {
     }
 
     clearMap(): void {
-        this.markers.forEach((marker: google.maps.Marker) => {
+        this.markers.forEach((marker: Marker) => {
             marker.setMap(null);
         })
         this.markers = [];
