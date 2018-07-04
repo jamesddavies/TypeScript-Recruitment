@@ -1,22 +1,23 @@
-declare var google: any;
-
 import app = require('durandal/app');
 import ko = require('knockout');
 import $ = require('jquery');
 
-type Crime = any;
+declare var google: any;
 
-//type Marker = google.maps.Marker;
-type Marker = any;
-//type Bounds = google.maps.LatLngBounds;
-type Bounds = any;
-//type Map = google.maps.Map;
-type Map = any;
+type Crime = any;
+type Marker = any; //google.maps.Marker
+type Bounds = any; //google.maps.LatLngBounds
+type Map = any; //google.maps.Map
+interface latLngObject { 
+    lat: number;
+    lng: number;
+}
 
 class mapSearch {
 
     postcode: KnockoutObservable<string>;
     map: Map;
+    mapCenter: latLngObject;
     markers: Marker[];
     bounds: Bounds;
     key: string;
@@ -27,17 +28,18 @@ class mapSearch {
 
     constructor(){
         this.postcode = ko.observable('');
+        this.mapCenter = {lat: 51.620671, lng: -3.932961};
         this.key = 'AIzaSyDP96fg0o4JSNjnOT69i_9ZquS2vWVcK-A';
         this.mashapeKey = 'U1e9OO4IdamshV44Do3XIX845EVnp1N2rIajsnICoqUR4xz3A0';
         this.geocodingURL = 'https://maps.googleapis.com/maps/api/geocode/json';
         this.crimesURL = 'https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-at-location';
         this.markers = [];
         this.bounds = new google.maps.LatLngBounds;
-        this.date = '2014-12';
+        this.date = '2017-08';
     }
 
     postcodeIsValid(): boolean {
-        let postcodeRegex = new RegExp('[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}', 'gi');
+        let postcodeRegex = /[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}/gi;
         return postcodeRegex.test(this.postcode())
     }
 
@@ -48,7 +50,7 @@ class mapSearch {
     }
 
     addMarkerToMap(crime: Crime): void {
-        let crimeLatLng = {
+        let crimeLatLng: latLngObject = {
             lat: parseFloat(crime.location.latitude), 
             lng: parseFloat(crime.location.longitude)
         };
@@ -59,13 +61,13 @@ class mapSearch {
         })
 
         let infowindow = new google.maps.InfoWindow({
-            content: `
-                <div>
-                    <p>Crime Category: ${crime.category}</p>
-                    <p>Crime Location: ${crime.location.street.name}</p>
-                    <p>Crime Outcome: ${crime.outcome_status ? crime.outcome_status.category : 'Not yet known'}
-                </div>
-            `
+            content: ' \
+                <div> \
+                    <p>Crime Category: ' + crime.category + '</p> \
+                    <p>Crime Location: ' + crime.location.street.name + '</p> \
+                    <p>Crime Outcome: ' + (crime.outcome_status ? crime.outcome_status.category : 'Not yet known') + ' \
+                </div> \
+            '
         })
 
         marker.addListener('click', () => {
@@ -76,33 +78,37 @@ class mapSearch {
         this.markers.push(marker)
     }
 
-    loadCrimesOnMap(): void {
+    fetchCrimesAndDrawMarkers(latlng: latLngObject): void {
         var self = this;
 
+        $.ajax({
+            url: self.crimesURL,
+            data: { date: self.date, lat: latlng.lat, lng: latlng.lng },
+            beforeSend: function(request: JQueryXHR){
+                request.setRequestHeader('X-Mashape-Key', self.mashapeKey);
+            },
+            success: function(crimes: Crime[]){
+                if (crimes.length){
+                    crimes.forEach((crime: Crime) => {
+                        self.addMarkerToMap(crime);
+                    })
+                    self.map.fitBounds(self.bounds);
+                } else {
+                    app.showMessage('No results found!');
+                }
+            },
+            error: function(err: JQueryXHR){
+                app.showMessage('Something went wrong: ' + err.statusText);
+            }
+        })
+    }
+
+    loadCrimesOnMap(): void {
         this.getLatLng().then(latlng => {
             if (!latlng){
                 app.showMessage('Location not found.');
             } else {
-                $.ajax({
-                    url: this.crimesURL,
-                    data: { date: this.date, lat: latlng.lat, lng: latlng.lng },
-                    beforeSend: function(request){
-                        request.setRequestHeader('X-Mashape-Key', self.mashapeKey);
-                    },
-                    success: function(crimes){
-                        if (crimes.length){
-                            crimes.forEach(crime => {
-                                this.addMarkerToMap(crime);
-                            })
-                            this.map.fitBounds(this.bounds);
-                        } else {
-                            app.showMessage('No results found!');
-                        }
-                    },
-                    error: function(err, textStatus, errMessage){
-                        app.showMessage('Something went wrong: ' + textStatus);
-                    }
-                })
+                this.fetchCrimesAndDrawMarkers(latlng);
             }
         })
     }
@@ -126,7 +132,7 @@ class mapSearch {
 
     initMap(): void {
         this.map = new google.maps.Map(document.getElementById('crimes-map'), {
-            center: {lat: 51.620671, lng: -3.932961},
+            center: this.mapCenter,
             zoom: 12
         })
     }
