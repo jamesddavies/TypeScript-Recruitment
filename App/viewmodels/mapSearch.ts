@@ -40,7 +40,7 @@ class mapSearch {
 
     postcodeIsValid(): boolean {
         let postcodeRegex = /[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}/gi;
-        return postcodeRegex.test(this.postcode())
+        return postcodeRegex.test(this.postcode());
     }
 
     getLatLng(): JQueryPromise<any> {
@@ -74,8 +74,8 @@ class mapSearch {
             infowindow.open(this.map, marker);
         })
 
-        this.bounds.extend(crimeLatLng)
-        this.markers.push(marker)
+        this.bounds.extend(crimeLatLng);
+        this.markers.push(marker);
     }
 
     fetchCrimesAndDrawMarkers(latlng: latLngObject): void {
