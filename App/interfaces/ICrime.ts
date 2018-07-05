@@ -1,6 +1,6 @@
 interface ICrime {
     category: string;
-    outcome_status: { [key: string]: string } | null;
+    outcome_status: any;
     location: any;
 }
 
