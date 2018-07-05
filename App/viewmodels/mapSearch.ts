@@ -2,22 +2,20 @@ import app = require('durandal/app');
 import ko = require('knockout');
 import $ = require('jquery');
 
+import ILatLng = require('../interfaces/ILatLng');
+import ICrime = require('../interfaces/ICrime');
+
 declare var google: any;
 
-type Crime = any;
 type Marker = any; //google.maps.Marker
 type Bounds = any; //google.maps.LatLngBounds
 type Map = any; //google.maps.Map
-interface latLngObject { 
-    lat: number;
-    lng: number;
-}
 
 class mapSearch {
 
     postcode: KnockoutObservable<string>;
     map: Map;
-    mapCenter: latLngObject;
+    mapCenter: ILatLng;
     markers: Marker[];
     bounds: Bounds;
     key: string;
@@ -49,8 +47,8 @@ class mapSearch {
         })
     }
 
-    addMarkerToMap(crime: Crime): void {
-        let crimeLatLng: latLngObject = {
+    addMarkerToMap(crime: ICrime): void {
+        let crimeLatLng: ILatLng = {
             lat: parseFloat(crime.location.latitude), 
             lng: parseFloat(crime.location.longitude)
         };
@@ -78,7 +76,7 @@ class mapSearch {
         this.markers.push(marker);
     }
 
-    fetchCrimesAndDrawMarkers(latlng: latLngObject): void {
+    fetchCrimesAndDrawMarkers(latlng: ILatLng): void {
         var self = this;
 
         $.ajax({
