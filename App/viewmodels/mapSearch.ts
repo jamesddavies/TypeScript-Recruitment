@@ -32,7 +32,8 @@ class mapSearch {
         this.key = 'AIzaSyDP96fg0o4JSNjnOT69i_9ZquS2vWVcK-A';
         this.mashapeKey = 'U1e9OO4IdamshV44Do3XIX845EVnp1N2rIajsnICoqUR4xz3A0';
         this.geocodingURL = 'https://maps.googleapis.com/maps/api/geocode/json';
-        this.crimesURL = 'https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-at-location';
+        //this.crimesURL = 'https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-at-location';
+        this.crimesURL = 'https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-street/all-crime';
         this.markers = [];
         this.bounds = new google.maps.LatLngBounds;
         this.date = '2017-07';
