@@ -16,6 +16,7 @@ type Map = google.maps.Map;
 class mapSearch {
 
     postcode: KnockoutObservable<string>;
+    loading: KnockoutObservable<boolean>;
     map: Map;
     mapCenter: ILatLng;
     markers: Marker[];
@@ -37,6 +38,7 @@ class mapSearch {
         this.markers = [];
         this.bounds = new google.maps.LatLngBounds;
         this.date = '2017-07';
+        this.loading = ko.observable(false);
     }
 
     postcodeIsValid(): boolean {
@@ -88,6 +90,7 @@ class mapSearch {
                 request.setRequestHeader('X-Mashape-Key', this.mashapeKey);
             },
             success: function(crimes: ICrime[]){
+                this.loading(false);
                 if (crimes.length){
                     crimes.forEach((crime: ICrime) => {
                         this.addMarkerToMap(crime);
@@ -98,6 +101,7 @@ class mapSearch {
                 }
             },
             error: function(err: JQueryXHR){
+                this.loading(false);
                 app.showMessage('Something went wrong: ' + err.statusText);
             }
         })
@@ -107,6 +111,7 @@ class mapSearch {
         this.getLatLngFromPostcode().then(latlng => {
             if (!latlng){
                 app.showMessage('Location not found.');
+                this.loading(false);
             } else {
                 this.fetchCrimesAndDrawMarkers(latlng);
             }
@@ -125,6 +130,7 @@ class mapSearch {
         if (!this.postcodeIsValid()){
             app.showMessage('This isn\'t a valid postcode!');
         } else {
+            this.loading(true);
             this.clearMap();
             this.loadCrimesOnMap();
         }

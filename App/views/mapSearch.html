@@ -1,5 +1,6 @@
 <form class="crimes-form" data-bind="submit: submitPostcode">
         <input type="text" data-bind="value: postcode" placeholder="Enter postcode" autofocus />
         <button type="submit">Show Crimes</button>
+        <p data-bind="visible: loading">Loading...</p>
 </form>
 <div id="crimes-map"></div>
