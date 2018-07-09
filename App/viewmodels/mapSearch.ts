@@ -64,13 +64,13 @@ class mapSearch {
         })
 
         let infowindow = new google.maps.InfoWindow({
-            content: ' \
-                <div> \
-                    <p>Crime Category: ' + StringHelper.cleanString(crime.category) + '</p> \
-                    <p>Crime Location: ' + crime.location.street.name + '</p> \
-                    <p>Crime Outcome: ' + (crime.outcome_status ? crime.outcome_status.category : 'Not yet known') + ' \
-                </div> \
-            '
+            content: `
+                <div> 
+                    <p>Crime Category: ${StringHelper.cleanString(crime.category)}</p>
+                    <p>Crime Location: ${crime.location.street.name}</p>
+                    <p>Crime Outcome: ${crime.outcome_status ? crime.outcome_status.category : 'Not yet known'}
+                </div>
+            `
         })
 
         marker.addListener('click', () => {
