@@ -3,14 +3,22 @@
     align-items: center;
     justify-content: center;
     margin: 10px 0 0 0;
+    position: relative;
 }
 
 .crimes-form input {
     margin: 0;
 }
 
-.crimes-form button, .crimes-form p {
+.crimes-form button {
     margin-left: 10px;
+}
+
+.crimes-form p {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
 }
 
 #crimes-map {
@@ -26,5 +34,9 @@
     }
     .crimes-form button {
         margin: 10px 0;
+    }
+    .crimes-form p {
+        bottom: 0;
+        transform: none;
     }
 }
